@@ -60,13 +60,43 @@ The probability of two people share a birthday starts from 0 and increases nonli
 
 ## Problem 2
 
+```{r}
+onet_sim = function(mu, n=30, sigma = 5){
+  x = rnorm(n, mean = mu, sd = sigma)
+  
+  test = t.test(x, mu = 0)
+  
+  tidy_test = broom::tidy(test)
+  
+  tibble(
+    mu_hat = tidy_test$estimate,
+    p_value = tidy_test$p.value
+  )
+}
+```
 
 
+```{r}
+onet_sim_df = expand_grid(
+  mu_true = 0:6,
+  iter = 1:5000
+) |> 
+  mutate(
+    onet_results = map(mu_true, onet_sim)
+  ) |> 
+  unnest(onet_results)
+```
 
-
-
-
-
+```{r}
+onet_summary = 
+  onet_sim_df |> 
+  group_by(mu_true) |> 
+  summarize(
+    power = mean(p_value<0.05),
+    mean_mu_hat_all = mean(mu_hat),
+    mean_mu_hat_rejected = mean(mu_hat[p_value<0.05])
+  )
+```
 
 
 
