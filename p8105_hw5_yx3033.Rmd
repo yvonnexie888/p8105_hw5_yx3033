@@ -55,6 +55,10 @@ ggplot(prob_df,
   )
 ```
 
+The probability of two people share a birthday starts from 0 and increases nonlinearly with group size. It reaches 50% when there are around 23 people. As the group size goes beyond 40, the probability grows start to slow down as the line gets flatter. 
+
+
+## Problem 2
 
 
 
