@@ -98,11 +98,35 @@ onet_summary =
   )
 ```
 
+```{r}
+ggplot(onet_summary,
+       aes(y=power, x=mu_true))+
+  geom_smooth(se = FALSE)+
+  geom_point()+
+  labs(
+    title = "Power vs True Mean",
+    x = "True Mean",
+    y = "Power of Rejecting False H0"
+  )+
+  theme_minimal()
+```
+
+The plot shows that the power increases with effect size. As the true mean increases, it becomes eaiser to detect
 
 
+```{r}
+ggplot(onet_summary,
+       aes(x = mu_true))+
+  geom_line(aes(y=mean_mu_hat_all, color = "All Samples"))+
+  geom_line(aes(y= mean_mu_hat_rejected, color="Rejected Samples"))+
+  labs(
+    title = "Mean Estimate vs True Mean (All Sample & Rejected Samples",
+    x = "True Mean",
+    y = "Average of Estimate"
+  )+
+  theme_minimal()
+```
 
-
-
-
+The average of mean across all samples are similar to the true mean. But the average mean among only rejected samples (significant samples) is biased upward because significant results tend to have larger observed value. This is a form of selection bias.
 
 
