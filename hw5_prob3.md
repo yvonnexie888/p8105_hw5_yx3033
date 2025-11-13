@@ -5,21 +5,10 @@ hw5_prob3
 library(tidyverse)
 ```
 
-    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-    ## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
-    ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-    ## ✔ purrr     1.1.0     
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::filter() masks stats::filter()
-    ## ✖ dplyr::lag()    masks stats::lag()
-    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
 ## Problem 3
 
 ``` r
-homicide_df = read_csv("data_hw5/homicide-data.csv")
+homicide_raw = read_csv("data_hw5/homicide-data.csv")
 ```
 
     ## Rows: 52179 Columns: 12
@@ -32,7 +21,7 @@ homicide_df = read_csv("data_hw5/homicide-data.csv")
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ``` r
-summary(homicide_df)
+summary(homicide_raw)
 ```
 
     ##      uid            reported_date       victim_last        victim_first      
@@ -65,3 +54,29 @@ The raw data contains 12 columns and 52,179 entries. Column variables
 are uid, reported_data, victim_last (all caped), victim_first (all
 caped), victim_race, victim_age, victim_sex, city, state, lat, lon, and
 disposition.
+
+Create a `city_state` variable.
+
+``` r
+homicide_df = 
+  homicide_raw |>
+  mutate(
+    city_state = paste(city, state, sep = ", ")
+  )
+```
+
+Summarize within cities to obtain the total number of homicides and the
+number of unsolved homicides (those for which the disposition is “Closed
+without arrest” or “Open/No arrest”).
+
+``` r
+homicide_summary  = 
+  homicide_df |> 
+  group_by(city_state) |> 
+  summarise(
+    total = n(),
+    unsolved = sum(disposition %in% c("Closed without arrest","Open/No arrest"))
+  )
+```
+
+For city of

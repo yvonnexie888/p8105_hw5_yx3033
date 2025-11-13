@@ -2,16 +2,54 @@
 title: "hw5_prob3"
 output: github_document
 ---
-```{r}
+```{r, message = FALSE}
 library(tidyverse)
 ```
 
 ## Problem 3
 
 ```{r}
-homicide_df = read_csv("data_hw5/homicide-data.csv")
-summary(homicide_df)
+homicide_raw = read_csv("data_hw5/homicide-data.csv")
+summary(homicide_raw)
 ```
 
 Comments on the raw data:  
 The raw data contains 12 columns and 52,179 entries. Column variables are uid, reported_data, victim_last (all caped), victim_first (all caped), victim_race, victim_age, victim_sex, city, state, lat, lon, and disposition.  
+
+
+Create a `city_state` variable.
+
+```{r}
+homicide_df = 
+  homicide_raw |>
+  mutate(
+    city_state = paste(city, state, sep = ", ")
+  )
+
+```
+
+Summarize within cities to obtain the total number of homicides and the number of unsolved homicides (those for which the disposition is "Closed without arrest" or "Open/No arrest").
+```{r}
+homicide_summary  = 
+  homicide_df |> 
+  group_by(city_state) |> 
+  summarise(
+    total = n(),
+    unsolved = sum(disposition %in% c("Closed without arrest","Open/No arrest"))
+  )
+```
+
+For city of 
+
+
+
+
+
+
+
+
+
+
+
+
+
