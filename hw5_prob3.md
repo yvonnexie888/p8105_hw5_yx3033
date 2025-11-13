@@ -159,11 +159,13 @@ homicide_results =
   arrange(estimate)
 
 homicide_plot = 
-  ggplot(homicide_results, 
-         aes(x = city_state, 
+  homicide_results |> 
+  mutate(city_state = reorder(city_state, estimate)) |>
+  ggplot(aes(x = city_state, 
              y = estimate))+
   geom_point()+
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high))+
+  coord_flip() + 
   labs(
     title = "Estimated Proportion of Unsolved Homicides by City",
     x = "City, State",
