@@ -62,8 +62,45 @@ baltimore_prop_tidy  =
 baltimore_prop_tidy
 ```
 
+run prop.test on each cities in the dataset.
+```{r}
+homicide_results=
+  homicide_summary |> 
+  mutate(
+    prop_test = map2(
+      unsolved, total, ~ prop.test(x= .x, n= .y)
+    ),
+    tidy_result = map(prop_test, broom::tidy)
+  ) |> 
+  unnest(tidy_result) |> 
+  select(city_state, estimate, conf.low, conf.high)
+
+homicide_results
+```
 
 
+Create a plot that shows the estimates and CIs for each city. 
+
+```{r}
+homicide_results = 
+ homicide_results |> 
+  arrange(estimate)
+
+homicide_plot = 
+  ggplot(homicide_results, 
+         aes(x = city_state, 
+             y = estimate))+
+  geom_point()+
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high))+
+  labs(
+    title = "Estimated Proportion of Unsolved Homicides by City",
+    x = "City, State",
+    y = "Proportion Unsolved (95% CI)"
+  ) +
+  theme_minimal()
+
+homicide_plot
+```
 
 
 

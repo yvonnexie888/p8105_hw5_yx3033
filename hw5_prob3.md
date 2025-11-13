@@ -111,3 +111,67 @@ baltimore_prop_tidy
     ##   estimate conf.low conf.high
     ##      <dbl>    <dbl>     <dbl>
     ## 1    0.646    0.628     0.663
+
+run prop.test on each cities in the dataset.
+
+``` r
+homicide_results=
+  homicide_summary |> 
+  mutate(
+    prop_test = map2(
+      unsolved, total, ~ prop.test(x= .x, n= .y)
+    ),
+    tidy_result = map(prop_test, broom::tidy)
+  ) |> 
+  unnest(tidy_result) |> 
+  select(city_state, estimate, conf.low, conf.high)
+```
+
+    ## Warning: There was 1 warning in `mutate()`.
+    ## ℹ In argument: `prop_test = map2(unsolved, total, ~prop.test(x = .x, n = .y))`.
+    ## Caused by warning in `prop.test()`:
+    ## ! Chi-squared approximation may be incorrect
+
+``` r
+homicide_results
+```
+
+    ## # A tibble: 51 × 4
+    ##    city_state      estimate conf.low conf.high
+    ##    <chr>              <dbl>    <dbl>     <dbl>
+    ##  1 Albuquerque, NM    0.386    0.337     0.438
+    ##  2 Atlanta, GA        0.383    0.353     0.415
+    ##  3 Baltimore, MD      0.646    0.628     0.663
+    ##  4 Baton Rouge, LA    0.462    0.414     0.511
+    ##  5 Birmingham, AL     0.434    0.399     0.469
+    ##  6 Boston, MA         0.505    0.465     0.545
+    ##  7 Buffalo, NY        0.612    0.569     0.654
+    ##  8 Charlotte, NC      0.300    0.266     0.336
+    ##  9 Chicago, IL        0.736    0.724     0.747
+    ## 10 Cincinnati, OH     0.445    0.408     0.483
+    ## # ℹ 41 more rows
+
+Create a plot that shows the estimates and CIs for each city.
+
+``` r
+homicide_results = 
+ homicide_results |> 
+  arrange(estimate)
+
+homicide_plot = 
+  ggplot(homicide_results, 
+         aes(x = city_state, 
+             y = estimate))+
+  geom_point()+
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high))+
+  labs(
+    title = "Estimated Proportion of Unsolved Homicides by City",
+    x = "City, State",
+    y = "Proportion Unsolved (95% CI)"
+  ) +
+  theme_minimal()
+
+homicide_plot
+```
+
+![](hw5_prob3_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
