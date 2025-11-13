@@ -130,3 +130,5 @@ ggplot(onet_summary,
 The average of mean across all samples are similar to the true mean. But the average mean among only rejected samples (significant samples) is biased upward because significant results tend to have larger observed value. This is a form of selection bias.
 
 
+## Problem 3
+

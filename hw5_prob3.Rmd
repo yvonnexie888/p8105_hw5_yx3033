@@ -1,0 +1,17 @@
+---
+title: "hw5_prob3"
+output: github_document
+---
+```{r}
+library(tidyverse)
+```
+
+## Problem 3
+
+```{r}
+homicide_df = read_csv("data_hw5/homicide-data.csv")
+summary(homicide_df)
+```
+
+Comments on the raw data:  
+The raw data contains 12 columns and 52,179 entries. Column variables are uid, reported_data, victim_last (all caped), victim_first (all caped), victim_race, victim_age, victim_sex, city, state, lat, lon, and disposition.  
