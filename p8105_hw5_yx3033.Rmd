@@ -131,4 +131,110 @@ The average of mean across all samples are similar to the true mean. But the ave
 
 
 ## Problem 3
+The commit history for problem 3 is under hw5_prob3.rmd file. 
+
+```{r}
+homicide_raw = read_csv("data_hw5/homicide-data.csv")
+summary(homicide_raw)
+```
+
+Comments on the raw data:  
+The raw data contains 12 columns and 52,179 entries. Column variables are uid, reported_data, victim_last (all caped), victim_first (all caped), victim_race, victim_age, victim_sex, city, state, lat, lon, and disposition.  
+
+
+Create a `city_state` variable.
+
+```{r}
+homicide_df = 
+  homicide_raw |>
+  mutate(
+    city_state = paste(city, state, sep = ", ")
+  )
+
+```
+
+Summarize within cities to obtain the total number of homicides and the number of unsolved homicides (those for which the disposition is "Closed without arrest" or "Open/No arrest").
+```{r}
+homicide_summary  = 
+  homicide_df |> 
+  group_by(city_state) |> 
+  summarise(
+    total = n(),
+    unsolved = sum(disposition %in% c("Closed without arrest","Open/No arrest"))
+  )
+```
+
+For the city of Baltimore, MD, use the `prop.test` function to estimate the proportion of homicides that are unsolved; save the output of prop.test as an R object, apply the broom::tidy to this object and pull the estimated proportion and confidence intervals from the resulting tidy dataframe. 
+
+```{r}
+baltimore_summary = 
+  homicide_df |> 
+  filter(city_state == "Baltimore, MD") |> 
+  summarise(
+    total = n(),
+    unsolved = sum(disposition %in% c("Closed without arrest","Open/No arrest"))
+  )
+```
+```{r}
+baltimore_prop = 
+  prop.test(
+    x = baltimore_summary$unsolved,
+    n = baltimore_summary$total
+  )
+baltimore_prop_tidy  = 
+  broom::tidy(baltimore_prop) |> 
+  select(estimate, conf.low, conf.high)
+baltimore_prop_tidy
+```
+
+run prop.test on each cities in the dataset.
+```{r}
+homicide_results=
+  homicide_summary |> 
+  mutate(
+    prop_test = map2(
+      unsolved, total, ~ prop.test(x= .x, n= .y)
+    ),
+    tidy_result = map(prop_test, broom::tidy)
+  ) |> 
+  unnest(tidy_result) |> 
+  select(city_state, estimate, conf.low, conf.high)
+
+homicide_results
+```
+
+
+Create a plot that shows the estimates and CIs for each city. 
+
+```{r, fig.width=10, fig.height=8}
+homicide_results = 
+ homicide_results |> 
+  arrange(estimate)
+
+homicide_plot = 
+  homicide_results |> 
+  mutate(city_state = reorder(city_state, estimate)) |>
+  ggplot(aes(x = city_state, 
+             y = estimate))+
+  geom_point()+
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high))+
+  coord_flip() + 
+  labs(
+    title = "Estimated Proportion of Unsolved Homicides by City",
+    x = "City, State",
+    y = "Proportion Unsolved (95% CI)"
+  ) +
+  theme_minimal()
+
+homicide_plot
+```
+
+
+
+
+
+
+
+
+
 
